@@ -4,7 +4,7 @@ project(OBJ)
 
 include_directories(
     "${CMAKE_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/lib"
+    "${CMAKE_SOURCE_DIR}/include"
 )
 
 link_directories(
@@ -13,7 +13,7 @@ link_directories(
 
 add_definitions(
     "-DFREEGLUT_STATIC"
-    )
+)
 
 add_executable(
     ${PROJECT_NAME}
