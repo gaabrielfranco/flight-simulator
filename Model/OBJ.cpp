@@ -144,7 +144,7 @@ void OBJ::Load(Model &model)
 
             for (;;)
             {
-               Model::FaceVertex vertex;
+               Model::Face_Vertex vertex;
 
                next();
                if (token.tag == Tag::NEWLINE) break;

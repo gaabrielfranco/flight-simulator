@@ -27,7 +27,7 @@ struct Model
       float k = 0;
    };
 
-   struct FaceVertex
+   struct Face_Vertex
    {
       size_t geometric_vertex = 0;
       size_t texture_vertex = 0;
@@ -36,7 +36,7 @@ struct Model
 
    struct Face
    {
-      std::vector<FaceVertex> vertices;
+      std::vector<Face_Vertex> vertices;
    };
 
    std::vector<Geometric_Vertex> geometric_vertices;
