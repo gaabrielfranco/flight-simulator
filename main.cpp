@@ -7,7 +7,7 @@ int main()
    Model model;
 
    OBJ obj("Samples/teste.obj");
-   obj.Load(model);
+   obj.load(model);
 
    return 0;
 }

@@ -24,7 +24,7 @@ void OBJ::reset()
    lexer.reset();
 }
 
-void OBJ::Load(Model &model)
+void OBJ::load(Model &model)
 {
    model.geometric_vertices.clear();
    model.geometric_vertices.push_back(Model::Geometric_Vertex{});

@@ -1,9 +1,9 @@
 #include <Model/Lexer.h>
 
 std::unordered_map<std::string, Tag> Lexer::keywords;
-Lexer::ScopeGuard Lexer::guard;
+Lexer::Scope_Guard Lexer::guard;
 
-Lexer::ScopeGuard::ScopeGuard()
+Lexer::Scope_Guard::Scope_Guard()
 {
    keywords["v"] = Tag::V;
    keywords["vt"] = Tag::VT;

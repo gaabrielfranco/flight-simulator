@@ -17,7 +17,7 @@ class OBJ
 
 public:
    OBJ(const char *filename);
-   void Load(Model &model);
+   void load(Model &model);
 };
 
 #endif   // OBJ_H

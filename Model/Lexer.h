@@ -26,13 +26,13 @@ struct Token
 
 class Lexer
 {
-   struct ScopeGuard
+   struct Scope_Guard
    {
-      ScopeGuard();
+      Scope_Guard();
    };
 
    static std::unordered_map<std::string, Tag> keywords;
-   static ScopeGuard guard;
+   static Scope_Guard guard;
 
    std::unique_ptr<char[]> buffer;
    size_t at;
