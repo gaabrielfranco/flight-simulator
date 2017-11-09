@@ -151,8 +151,7 @@ void OBJ::load(Model &model)
 
                assert(token.tag == Tag::NUMBER);
 
-               vertex.geometric_vertex =
-                  strtoull(token.lexeme.c_str(), nullptr, 10);
+               vertex.geometric_vertex = std::stoull(token.lexeme, nullptr, 10);
 
                next();
 
@@ -166,14 +165,14 @@ void OBJ::load(Model &model)
                      assert(token.tag == Tag::NUMBER);
 
                      vertex.normal_vertex =
-                        strtoull(token.lexeme.c_str(), nullptr, 10);
+                        std::stoull(token.lexeme, nullptr, 10);
                   }
                   else
                   {
                      assert(token.tag == Tag::NUMBER);
 
                      vertex.texture_vertex =
-                        strtoull(token.lexeme.c_str(), nullptr, 10);
+                        std::stoull(token.lexeme, nullptr, 10);
 
                      next();
 
@@ -183,7 +182,7 @@ void OBJ::load(Model &model)
                         assert(token.tag == Tag::NUMBER);
 
                         vertex.normal_vertex =
-                           strtoull(token.lexeme.c_str(), nullptr, 10);
+                           std::stoull(token.lexeme, nullptr, 10);
                      }
                      else
                      {
