@@ -6,5 +6,5 @@ Para carregar arquivos OBJ:
 
 ```cpp
 OBJ obj("<nome_do_arquivo");
-obj.Load(model);
+obj.load(model);
 ```
