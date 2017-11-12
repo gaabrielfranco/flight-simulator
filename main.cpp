@@ -29,8 +29,7 @@ struct Freeze
 
 Airplane airplane;
 Freeze elements[5];
-Model tower;
-Model airfield;
+Model tower, airfield, road;
 int width = 800, height = 600;
 
 void init(void)
@@ -83,12 +82,31 @@ void display(void)
     glEnd();
     glPopMatrix();
 
-    //Desenha aeroporto
+    //Desenha estrada
+    glPushMatrix();
+    glColor4f(1.0, 0.0, 1.0, 0.8);
+    glTranslatef(0, 0, 0);
+    glScalef(15.0, 15.0, 15.0);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glBegin(GL_TRIANGLES);
+    for (auto &face : road.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex3f(road.geometric_vertices[vertex.geometric_vertex].x,
+                       road.geometric_vertices[vertex.geometric_vertex].y,
+                       road.geometric_vertices[vertex.geometric_vertex].z);
+        }
+    }
+    glEnd();
+    glPopMatrix();
+
+    //Desenha prédio
     glPushMatrix();
     glColor4f(0.0, 1.0, 1.0, 0.8);
-    //glTranslatef(-10000, -10000, -10000);
-    glScalef(50000.0, 50000.0, 50000.0);
-    //glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glTranslatef(100, 0, 0);
+    glScalef(5.0, 5.0, 5.0);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
     for (auto &face : airfield.faces)
     {
@@ -216,8 +234,11 @@ int main(int argc, char **argv)
     OBJ obj2("Samples/tower.obj");
     obj2.load(tower);
 
-    OBJ obj3("Samples/3d-model.obj");
+    OBJ obj3("Samples/building.obj");
     obj3.load(airfield);
+
+    OBJ obj4("Samples/road.obj");
+    obj4.load(road);
 
     glutInit(&argc, argv);                                    //inicializa a glut
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); //tipo de buffer/cores/profundidade
