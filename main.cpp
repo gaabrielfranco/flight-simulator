@@ -30,6 +30,7 @@ struct Freeze
 Airplane airplane;
 Freeze elements[5];
 Model tower;
+Model airfield;
 int width = 800, height = 600;
 
 void init(void)
@@ -80,6 +81,26 @@ void display(void)
     glVertex3f(1000.0, 0.0, 1000.0);
     glVertex3f(1000.0, 0.0, -1000.0);
     glEnd();
+    glPopMatrix();
+
+        //Desenha aeroporto
+    glPushMatrix();
+    glColor4f(0.0, 1.0, 1.0, 0.8);
+    glTranslatef(-500, 0, -500);
+    glScalef(50.0, 50.0, 50.0);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glBegin(GL_TRIANGLES);
+    for (auto &face : airfield.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex3f(airfield.geometric_vertices[vertex.geometric_vertex].x,
+                       airfield.geometric_vertices[vertex.geometric_vertex].y,
+                       airfield.geometric_vertices[vertex.geometric_vertex].z);
+        }
+    }
+    glEnd();
+
     glPopMatrix();
 
     //Desenha torre
@@ -195,6 +216,9 @@ int main(int argc, char **argv)
 
     OBJ obj2("Samples/tower.obj");
     obj2.load(tower);
+
+    OBJ obj3("Samples/3d-model.obj");
+    obj3.load(airfield);
 
     glutInit(&argc, argv);                                    //inicializa a glut
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); //tipo de buffer/cores/profundidade
