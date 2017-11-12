@@ -60,9 +60,9 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
     glLoadIdentity();
     gluLookAt(
-        airplane.position[0] - 200,
-        airplane.position[1] + 50,
-        airplane.position[2] - 50,
+        airplane.position[0] - 70,
+        airplane.position[1] + 35,
+        airplane.position[2] - 2.5,
         airplane.position[0],
         airplane.position[1],
         airplane.position[2],
