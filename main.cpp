@@ -20,7 +20,7 @@ struct Airplane
 
 Airplane airplane;
 Model tower, airfield, road;
-int width = 800, height = 600;
+int width = 500, height = 500;
 GLfloat coords[3] = {0.0, 0.0, 0.0};
 
 void rotate_y(float angle)
@@ -34,16 +34,9 @@ void rotate_y(float angle)
 
 void init(void)
 {
-    glClearColor(1.0, 1.0, 1.0, 1.0); //cor para limpeza do buffer
+    glClearColor(1.0, 1.0, 1.0, 1.0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    //glOrtho(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0); //proje��o paralela
-
-    //glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0); //proje��o perspectiva
-
-    //gluPerspective(70.0, 1.0, 2.0, 20.0); // proje��o perspectiva
-
     glFrustum(-2.0, 2.0, -1.225, 1.225, 2.0, 10000.0);
 
     glMatrixMode(GL_MODELVIEW);
@@ -52,35 +45,45 @@ void init(void)
 void display(void)
 {
 
+    //Movimentação
     if (airplane.moving)
     {
         airplane.position[0] -= 5 * airplane.facing[0];
         airplane.position[2] -= 5 * airplane.facing[2];
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    gluLookAt(
-        /*airplane.position[0] - 70,
-        airplane.position[1] + 35,
-        airplane.position[2] - 2.5,
-        airplane.position[0],
-        airplane.position[1],
-        airplane.position[2],
-        0.0,
-        1.0,
-        0.0*/
-        airplane.position[0] + (airplane.facing[0] * 300),
-        airplane.position[1] + 100,
-        airplane.position[2] + (airplane.facing[2] * 300),
-        airplane.position[0] - (airplane.facing[0] * 100),
-        airplane.position[1] - (airplane.facing[1] * 100),
-        airplane.position[2] - (airplane.facing[2] * 100),
-        0.0,
-        1.0,
-        0.0);
 
-    //Desenha "asfasto"
+    //Mudança entre camera dentro e fora do avião
+    if (airplane.inside)
+    {
+        gluLookAt(
+            airplane.position[0] - (airplane.facing[0] * 10),
+            airplane.position[1] + 70,
+            airplane.position[2] - (airplane.facing[2] * 10),
+            airplane.position[0] - (airplane.facing[0] * 300),
+            airplane.position[1],
+            airplane.position[2] - (airplane.facing[2] * 300),
+            0.0,
+            1.0,
+            0.0);
+    }
+    else
+    {
+        gluLookAt(
+            airplane.position[0] + (airplane.facing[0] * 300),
+            airplane.position[1] + 100,
+            airplane.position[2] + (airplane.facing[2] * 300),
+            airplane.position[0] - (airplane.facing[0] * 100),
+            airplane.position[1] - (airplane.facing[1] * 100),
+            airplane.position[2] - (airplane.facing[2] * 100),
+            0.0,
+            1.0,
+            0.0);
+    }
+
+    //Desenha "asfalto"
     glPushMatrix();
     glColor4f(0.5, 0.5, 0.5, 0.3);
     glRotatef(30, 0.0, 1.0, 0.0);
@@ -156,7 +159,6 @@ void display(void)
     //Desenha avião
     glPushMatrix();
     glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
-    //glRotatef(90, 0.0, 1.0, 0.0);
     glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glColor3f(1.0, 0.0, 0.0);
 
@@ -169,60 +171,51 @@ void display(void)
                        airplane.model.geometric_vertices[vertex.geometric_vertex].y,
                        airplane.model.geometric_vertices[vertex.geometric_vertex].z,
                        airplane.model.geometric_vertices[vertex.geometric_vertex].w);
-
-            /*glNormal3f(airplane.model.normal_vertices[vertex.normal_vertex].i,
-                       airplane.model.normal_vertices[vertex.normal_vertex].j,
-                       airplane.model.normal_vertices[vertex.normal_vertex].k);*/
         }
     }
     glEnd();
     glPopMatrix();
-
-    /*glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
-    glTranslatef(-airplane.position[0], -airplane.position[1], -airplane.position[2]);*/
 
     glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int x, int y)
 {
-
     if (key == 27)
     {
         exit(0);
     }
 
-    if (key == 'c' || key == 'C')
+    if (key == 'x' || key == 'X')
     {
         if (airplane.position[1] < 4000)
             airplane.position[1] += 5.0;
     }
 
-    if (key == 'b' || key == 'B')
+    if (key == 'z' || key == 'Z')
     {
         if (airplane.position[1] > 0)
             airplane.position[1] -= 5.0;
     }
 
-    if (key == 'e' || key == 'E')
+    if (key == 'd' || key == 'D')
     {
         airplane.angle += 1.0;
         rotate_y(-1.0);
     }
 
-    if (key == 'd' || key == 'D')
+    if (key == 'a' || key == 'A')
     {
         airplane.angle -= 1.0;
         rotate_y(1.0);
     }
 
-    if (key == 'a' || key == 'A')
+    if (key == 'w' || key == 'W')
     {
         airplane.moving = true;
     }
 
-    if (key == 'p' || key == 'P')
+    if (key == 's' || key == 'S')
     {
         airplane.moving = false;
     }
@@ -242,6 +235,7 @@ int main(int argc, char **argv)
 {
     Model model;
 
+    //Load dos modelos
     OBJ obj("Samples/airplane.obj");
     obj.load(model);
     airplane.model = model;
@@ -255,49 +249,19 @@ int main(int argc, char **argv)
     OBJ obj4("Samples/road.obj");
     obj4.load(road);
 
-    glutInit(&argc, argv);                                    //inicializa a glut
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); //tipo de buffer/cores/profundidade
-    glutInitWindowSize(width, height);                        //dimens�es da janela
-    //glutInitWindowPosition(200, 200);                         //posicao da janela
-    glutCreateWindow("Visualizacao 3D - Exemplo 1"); //cria a janela
+    //Main do openGL
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(width, height);
+    glutCreateWindow("Trabalho de Computação Gráfica");
     init();
     glutIdleFunc(display);
     glutKeyboardFunc(keyboard);
-    glutDisplayFunc(display); //determina fun��o callback de desenho
-    glEnable(GL_CULL_FACE);   //habilita remo��o de superf�cies ocultas
+    glutDisplayFunc(display);
+    glEnable(GL_CULL_FACE);
     glutMainLoop();
 
     glutMainLoop();
-
-    /*for (auto &v : model.geometric_vertices)
-    {
-        printf("v %f %f %f %f\n", v.x, v.y, v.z, v.w);
-    }
-
-    for (auto &vt : model.texture_vertices)
-    {
-        printf("vt %f %f %f\n", vt.u, vt.v, vt.w);
-    }
-
-    for (auto &vn : model.normal_vertices)
-    {
-        printf("vn %f %f %f\n", vn.i, vn.j, vn.k);
-    }*/
-
-    /*for (auto &face : model.faces)
-    {
-        printf("f ");
-        for (auto &vertex : face.vertices)
-        {
-            //printf("%llu/%llu/%llu ", vertex.geometric_vertex,
-            //       vertex.texture_vertex, vertex.normal_vertex);
-            printf("%f/%f/%f/%f\n", model.geometric_vertices[vertex.geometric_vertex].x,
-                   model.geometric_vertices[vertex.geometric_vertex].y,
-                   model.geometric_vertices[vertex.geometric_vertex].z,
-                   model.geometric_vertices[vertex.geometric_vertex].w);
-        }
-        printf("\n");
-    }*/
 
     return 0;
 }
