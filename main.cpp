@@ -1,39 +1,217 @@
 #include <Model/OBJ.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <ctime>
+#include <gm.h>
+
+#define num_objects 10
 
 using namespace std;
 
-int main()
+struct Airplane
 {
-   Model model;
+    Model model;
+    bool moving = false;
+    bool inside = false;
+    float angle = 0.0;
+    float position[3] = {0.0, 0.0, 0.0};
+};
 
-   OBJ obj("Samples/teste.obj");
-   obj.load(model);
+struct Freeze
+{
+    //OBJ::OBJ *model;
+    float scale = 1.0;
+    float y[num_objects];
+    float x[num_objects];
+    float z[num_objects];
+    float angle[num_objects];
+};
 
-   for (auto &v : model.geometric_vertices)
-   {
-      printf("v %f %f %f %f\n", v.x, v.y, v.z, v.w);
-   }
+Airplane airplane;
+Freeze elements[5];
+int width = 800, height = 600;
 
-   for (auto &vt : model.texture_vertices)
-   {
-      printf("vt %f %f %f\n", vt.u, vt.v, vt.w);
-   }
+void init(void)
+{
+    glClearColor(1.0, 1.0, 1.0, 1.0); //cor para limpeza do buffer
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-   for (auto &vn : model.normal_vertices)
-   {
-      printf("vn %f %f %f\n", vn.i, vn.j, vn.k);
-   }
+    //glOrtho(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0); //proje��o paralela
 
-   for (auto &face : model.faces)
-   {
-      printf("f ");
-      for (auto &vertex : face.vertices)
-      {
-         printf("%llu/%llu/%llu ", vertex.geometric_vertex,
-                vertex.texture_vertex, vertex.normal_vertex);
-      }
-      printf("\n");
-   }
+    //glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0); //proje��o perspectiva
 
-   return 0;
+    //gluPerspective(70.0, 1.0, 2.0, 20.0); // proje��o perspectiva
+
+    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 10000.0);
+
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void display(void)
+{
+
+    if (airplane.moving)
+    {
+        airplane.position[0] += 0.1;
+        airplane.position[2] += 0.1;
+    }
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
+    glLoadIdentity();
+    gluLookAt(
+        airplane.position[0] - 200,
+        airplane.position[1] + 50,
+        airplane.position[2] - 50,
+        airplane.position[0],
+        airplane.position[1],
+        airplane.position[2],
+        0.0,
+        1.0,
+        0.0);
+
+    glPushMatrix();
+    glColor4f(0.5, 0.5, 0.5, 0.3);
+    glBegin(GL_POLYGON);
+    glVertex3f(-1000.0, 0.0, -1000.0);
+    glVertex3f(-1000.0, 0.0, 1000.0);
+    glVertex3f(1000.0, 0.0, 1000.0);
+    glVertex3f(1000.0, 0.0, -1000.0);
+    glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
+    glRotatef(90, 0.0, 1.0, 0.0);
+    glColor3f(1.0, 0.0, 0.0);
+
+    glBegin(GL_TRIANGLES);
+    for (auto &face : airplane.model.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex3f(airplane.model.geometric_vertices[vertex.geometric_vertex].x,
+                       airplane.model.geometric_vertices[vertex.geometric_vertex].y,
+                       airplane.model.geometric_vertices[vertex.geometric_vertex].z);
+
+            /*glNormal3f(airplane.model.normal_vertices[vertex.normal_vertex].i,
+                       airplane.model.normal_vertices[vertex.normal_vertex].j,
+                       airplane.model.normal_vertices[vertex.normal_vertex].k);*/
+        }
+    }
+    glEnd();
+    glPopMatrix();
+
+    glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glTranslatef(-airplane.position[0], -airplane.position[1], -airplane.position[2]);
+
+    glutSwapBuffers();
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+
+    if (key == 27)
+    {
+        exit(0);
+    }
+
+    if (key == 'c' || key == 'C')
+    {
+        if (airplane.position[1] < 4000)
+            airplane.position[1] += 5.0;
+    }
+
+    if (key == 'b' || key == 'B')
+    {
+        if (airplane.position[1] > 0)
+            airplane.position[1] -= 5.0;
+    }
+
+    if (key == 'e' || key == 'E')
+    {
+        airplane.angle -= 20.0;
+        //airplane.facing.rotate_y(-5.0);
+    }
+
+    if (key == 'd' || key == 'D')
+    {
+        airplane.angle += 20.0;
+        //airplane.facing.rotate_y(5.0);
+    }
+
+    if (key == 'a' || key == 'A')
+    {
+        airplane.moving = true;
+    }
+
+    if (key == 'p' || key == 'P')
+    {
+        airplane.moving = false;
+    }
+
+    if (key == 'f' || key == 'F')
+    {
+        airplane.inside = false;
+    }
+
+    if (key == 'i' || key == 'I')
+    {
+        airplane.inside = true;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    Model model;
+
+    OBJ obj("Samples/airplane.obj");
+    obj.load(model);
+    airplane.model = model;
+    glutInit(&argc, argv);                                    //inicializa a glut
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); //tipo de buffer/cores/profundidade
+    glutInitWindowSize(width, height);                        //dimens�es da janela
+    //glutInitWindowPosition(200, 200);                         //posicao da janela
+    glutCreateWindow("Visualizacao 3D - Exemplo 1"); //cria a janela
+    init();
+    glutIdleFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutDisplayFunc(display); //determina fun��o callback de desenho
+    glEnable(GL_CULL_FACE);   //habilita remo��o de superf�cies ocultas
+    glutMainLoop();
+
+    glutMainLoop();
+
+    /*for (auto &v : model.geometric_vertices)
+    {
+        printf("v %f %f %f %f\n", v.x, v.y, v.z, v.w);
+    }
+
+    for (auto &vt : model.texture_vertices)
+    {
+        printf("vt %f %f %f\n", vt.u, vt.v, vt.w);
+    }
+
+    for (auto &vn : model.normal_vertices)
+    {
+        printf("vn %f %f %f\n", vn.i, vn.j, vn.k);
+    }*/
+
+    /*for (auto &face : model.faces)
+    {
+        printf("f ");
+        for (auto &vertex : face.vertices)
+        {
+            //printf("%llu/%llu/%llu ", vertex.geometric_vertex,
+            //       vertex.texture_vertex, vertex.normal_vertex);
+            printf("%f/%f/%f/%f\n", model.geometric_vertices[vertex.geometric_vertex].x,
+                   model.geometric_vertices[vertex.geometric_vertex].y,
+                   model.geometric_vertices[vertex.geometric_vertex].z,
+                   model.geometric_vertices[vertex.geometric_vertex].w);
+        }
+        printf("\n");
+    }*/
+
+    return 0;
 }

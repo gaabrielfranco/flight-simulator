@@ -30,6 +30,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     "freeglut_static"
     "opengl32"
+    "glu32"
     "winmm"
     "gdi32"
 )
