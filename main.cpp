@@ -88,7 +88,7 @@ void display(void)
     glTranslatef(0, 0, 0);
     glScalef(15.0, 15.0, 15.0);
     glRotatef(airplane.angle, 0.0, 1.0, 0.0);
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_QUADS);
     for (auto &face : road.faces)
     {
         for (auto &vertex : face.vertices)
@@ -107,7 +107,7 @@ void display(void)
     glTranslatef(100, 0, 0);
     glScalef(5.0, 5.0, 5.0);
     glRotatef(airplane.angle, 0.0, 1.0, 0.0);
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_QUADS);
     for (auto &face : airfield.faces)
     {
         for (auto &vertex : face.vertices)
@@ -151,9 +151,10 @@ void display(void)
     {
         for (auto &vertex : face.vertices)
         {
-            glVertex3f(airplane.model.geometric_vertices[vertex.geometric_vertex].x,
+            glVertex4f(airplane.model.geometric_vertices[vertex.geometric_vertex].x,
                        airplane.model.geometric_vertices[vertex.geometric_vertex].y,
-                       airplane.model.geometric_vertices[vertex.geometric_vertex].z);
+                       airplane.model.geometric_vertices[vertex.geometric_vertex].z,
+                       airplane.model.geometric_vertices[vertex.geometric_vertex].w);
 
             /*glNormal3f(airplane.model.normal_vertices[vertex.normal_vertex].i,
                        airplane.model.normal_vertices[vertex.normal_vertex].j,
