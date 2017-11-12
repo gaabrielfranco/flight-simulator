@@ -13,24 +13,24 @@ struct Airplane
     Model model;
     bool moving = false;
     bool inside = false;
-    float angle = 0.0;
+    float angle = 270.0;
     float position[3] = {0.0, 0.0, 0.0};
-};
-
-struct Freeze
-{
-    //OBJ::OBJ *model;
-    float scale = 1.0;
-    float y[num_objects];
-    float x[num_objects];
-    float z[num_objects];
-    float angle[num_objects];
+    GLfloat facing[3] = {1.0, 0.0, 0.0};
 };
 
 Airplane airplane;
-Freeze elements[5];
 Model tower, airfield, road;
 int width = 800, height = 600;
+GLfloat coords[3] = {0.0, 0.0, 0.0};
+
+void rotate_y(float angle)
+{
+    angle *= 0.0174533;
+    float x = airplane.facing[0];
+    float z = airplane.facing[2];
+    airplane.facing[0] = x * cos(angle) - z * sin(angle);
+    airplane.facing[2] = x * sin(angle) + z * cos(angle);
+}
 
 void init(void)
 {
@@ -44,7 +44,7 @@ void init(void)
 
     //gluPerspective(70.0, 1.0, 2.0, 20.0); // proje��o perspectiva
 
-    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 10000.0);
+    glFrustum(-2.0, 2.0, -1.225, 1.225, 2.0, 10000.0);
 
     glMatrixMode(GL_MODELVIEW);
 }
@@ -54,13 +54,14 @@ void display(void)
 
     if (airplane.moving)
     {
-        airplane.position[0] += 5;
+        airplane.position[0] -= 5 * airplane.facing[0];
+        airplane.position[2] -= 5 * airplane.facing[2];
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
     glLoadIdentity();
     gluLookAt(
-        airplane.position[0] - 70,
+        /*airplane.position[0] - 70,
         airplane.position[1] + 35,
         airplane.position[2] - 2.5,
         airplane.position[0],
@@ -68,12 +69,21 @@ void display(void)
         airplane.position[2],
         0.0,
         1.0,
+        0.0*/
+        airplane.position[0] + (airplane.facing[0] * 300),
+        airplane.position[1] + 100,
+        airplane.position[2] + (airplane.facing[2] * 300),
+        airplane.position[0] - (airplane.facing[0] * 100),
+        airplane.position[1] - (airplane.facing[1] * 100),
+        airplane.position[2] - (airplane.facing[2] * 100),
+        0.0,
+        1.0,
         0.0);
 
     //Desenha "asfasto"
     glPushMatrix();
     glColor4f(0.5, 0.5, 0.5, 0.3);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glRotatef(30, 0.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
     glVertex3f(-1000.0, 0.0, -1000.0);
     glVertex3f(-1000.0, 0.0, 1000.0);
@@ -87,15 +97,16 @@ void display(void)
     glColor4f(1.0, 0.0, 1.0, 0.8);
     glTranslatef(0, 0, 0);
     glScalef(15.0, 15.0, 15.0);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glRotatef(90, 0.0, 1.0, 0.0);
     glBegin(GL_QUADS);
     for (auto &face : road.faces)
     {
         for (auto &vertex : face.vertices)
         {
-            glVertex3f(road.geometric_vertices[vertex.geometric_vertex].x,
+            glVertex4f(road.geometric_vertices[vertex.geometric_vertex].x,
                        road.geometric_vertices[vertex.geometric_vertex].y,
-                       road.geometric_vertices[vertex.geometric_vertex].z);
+                       road.geometric_vertices[vertex.geometric_vertex].z,
+                       road.geometric_vertices[vertex.geometric_vertex].w);
         }
     }
     glEnd();
@@ -106,15 +117,16 @@ void display(void)
     glColor4f(0.0, 1.0, 1.0, 0.8);
     glTranslatef(100, 0, 0);
     glScalef(5.0, 5.0, 5.0);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glRotatef(45, 0.0, 1.0, 0.0);
     glBegin(GL_QUADS);
     for (auto &face : airfield.faces)
     {
         for (auto &vertex : face.vertices)
         {
-            glVertex3f(airfield.geometric_vertices[vertex.geometric_vertex].x,
+            glVertex4f(airfield.geometric_vertices[vertex.geometric_vertex].x,
                        airfield.geometric_vertices[vertex.geometric_vertex].y,
-                       airfield.geometric_vertices[vertex.geometric_vertex].z);
+                       airfield.geometric_vertices[vertex.geometric_vertex].z,
+                       airfield.geometric_vertices[vertex.geometric_vertex].w);
         }
     }
     glEnd();
@@ -125,15 +137,16 @@ void display(void)
     glColor4f(0.0, 1.0, 0.0, 0.8);
     glTranslatef(-1000, 0, -1000);
     glScalef(50.0, 50.0, 50.0);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glRotatef(90, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
     for (auto &face : tower.faces)
     {
         for (auto &vertex : face.vertices)
         {
-            glVertex3f(tower.geometric_vertices[vertex.geometric_vertex].x,
+            glVertex4f(tower.geometric_vertices[vertex.geometric_vertex].x,
                        tower.geometric_vertices[vertex.geometric_vertex].y,
-                       tower.geometric_vertices[vertex.geometric_vertex].z);
+                       tower.geometric_vertices[vertex.geometric_vertex].z,
+                       tower.geometric_vertices[vertex.geometric_vertex].w);
         }
     }
     glEnd();
@@ -143,7 +156,8 @@ void display(void)
     //Desenha avião
     glPushMatrix();
     glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
-    glRotatef(90, 0.0, 1.0, 0.0);
+    //glRotatef(90, 0.0, 1.0, 0.0);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glColor3f(1.0, 0.0, 0.0);
 
     glBegin(GL_TRIANGLES);
@@ -164,9 +178,9 @@ void display(void)
     glEnd();
     glPopMatrix();
 
-    glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
+    /*glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
     glRotatef(airplane.angle, 0.0, 1.0, 0.0);
-    glTranslatef(-airplane.position[0], -airplane.position[1], -airplane.position[2]);
+    glTranslatef(-airplane.position[0], -airplane.position[1], -airplane.position[2]);*/
 
     glutSwapBuffers();
 }
@@ -193,14 +207,14 @@ void keyboard(unsigned char key, int x, int y)
 
     if (key == 'e' || key == 'E')
     {
-        airplane.angle -= 1;
-        //airplane.facing.rotate_y(-5.0);
+        airplane.angle += 1.0;
+        rotate_y(-1.0);
     }
 
     if (key == 'd' || key == 'D')
     {
-        airplane.angle += 1;
-        //airplane.facing.rotate_y(5.0);
+        airplane.angle -= 1.0;
+        rotate_y(1.0);
     }
 
     if (key == 'a' || key == 'A')
