@@ -29,6 +29,7 @@ struct Freeze
 
 Airplane airplane;
 Freeze elements[5];
+Model tower;
 int width = 800, height = 600;
 
 void init(void)
@@ -53,7 +54,7 @@ void display(void)
 
     if (airplane.moving)
     {
-        airplane.position[0] += 0.1;
+        airplane.position[0] += 5;
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
@@ -69,8 +70,10 @@ void display(void)
         1.0,
         0.0);
 
+    //Desenha "asfasto"
     glPushMatrix();
     glColor4f(0.5, 0.5, 0.5, 0.3);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
     glVertex3f(-1000.0, 0.0, -1000.0);
     glVertex3f(-1000.0, 0.0, 1000.0);
@@ -79,6 +82,27 @@ void display(void)
     glEnd();
     glPopMatrix();
 
+    //Desenha torre
+    glPushMatrix();
+    glColor4f(0.0, 1.0, 0.0, 0.8);
+    glTranslatef(-1000, 0, -1000);
+    glScalef(50.0, 50.0, 50.0);
+    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    glBegin(GL_TRIANGLES);
+    for (auto &face : tower.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex3f(tower.geometric_vertices[vertex.geometric_vertex].x,
+                       tower.geometric_vertices[vertex.geometric_vertex].y,
+                       tower.geometric_vertices[vertex.geometric_vertex].z);
+        }
+    }
+    glEnd();
+
+    glPopMatrix();
+
+    //Desenha avião
     glPushMatrix();
     glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
     glRotatef(90, 0.0, 1.0, 0.0);
@@ -130,13 +154,13 @@ void keyboard(unsigned char key, int x, int y)
 
     if (key == 'e' || key == 'E')
     {
-        airplane.angle -= 50.0;
+        airplane.angle -= 1;
         //airplane.facing.rotate_y(-5.0);
     }
 
     if (key == 'd' || key == 'D')
     {
-        airplane.angle += 50.0;
+        airplane.angle += 1;
         //airplane.facing.rotate_y(5.0);
     }
 
@@ -168,6 +192,10 @@ int main(int argc, char **argv)
     OBJ obj("Samples/airplane.obj");
     obj.load(model);
     airplane.model = model;
+
+    OBJ obj2("Samples/tower.obj");
+    obj2.load(tower);
+
     glutInit(&argc, argv);                                    //inicializa a glut
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); //tipo de buffer/cores/profundidade
     glutInitWindowSize(width, height);                        //dimens�es da janela
