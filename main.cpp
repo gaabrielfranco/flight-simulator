@@ -54,7 +54,6 @@ void display(void)
     if (airplane.moving)
     {
         airplane.position[0] += 0.1;
-        airplane.position[2] += 0.1;
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
@@ -131,13 +130,13 @@ void keyboard(unsigned char key, int x, int y)
 
     if (key == 'e' || key == 'E')
     {
-        airplane.angle -= 20.0;
+        airplane.angle -= 50.0;
         //airplane.facing.rotate_y(-5.0);
     }
 
     if (key == 'd' || key == 'D')
     {
-        airplane.angle += 20.0;
+        airplane.angle += 50.0;
         //airplane.facing.rotate_y(5.0);
     }
 
