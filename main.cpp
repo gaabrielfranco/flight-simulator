@@ -83,12 +83,12 @@ void display(void)
     glEnd();
     glPopMatrix();
 
-        //Desenha aeroporto
+    //Desenha aeroporto
     glPushMatrix();
     glColor4f(0.0, 1.0, 1.0, 0.8);
-    glTranslatef(-500, 0, -500);
-    glScalef(50.0, 50.0, 50.0);
-    glRotatef(airplane.angle, 0.0, 1.0, 0.0);
+    //glTranslatef(-10000, -10000, -10000);
+    glScalef(50000.0, 50000.0, 50000.0);
+    //glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
     for (auto &face : airfield.faces)
     {
@@ -100,7 +100,6 @@ void display(void)
         }
     }
     glEnd();
-
     glPopMatrix();
 
     //Desenha torre
