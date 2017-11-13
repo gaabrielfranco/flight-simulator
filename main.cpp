@@ -86,10 +86,10 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    //Mudança entre camera dentro e fora
     switch (fm_selected)
     {
     case 1:
-        //Mudança entre camera dentro e fora do avião
         if (airplane.inside)
         {
             gluLookAt(
@@ -177,7 +177,7 @@ void display(void)
         break;
     }
 
-    //Desenha "asfalto"
+    //Desenha chão
     glPushMatrix();
     glColor4f(0.5, 0.5, 0.5, 0.3);
     glRotatef(30, 0.0, 1.0, 0.0);
@@ -319,7 +319,7 @@ void display(void)
     glEnd();
     glPopMatrix();
 
-    //Desenha millenium falcon
+    //Desenha helicóptero
     glPushMatrix();
     glTranslatef(helicopter.position[0], helicopter.position[1], helicopter.position[2]);
     glRotatef(helicopter.angle, 0.0, 1.0, 0.0);
@@ -571,7 +571,6 @@ int main(int argc, char **argv)
     helicopter.model = model3;
     helicopter.angle = 90.0;
     helicopter.position[0] = 500.0;
-    //helicopter.position[1] = 5.0;
     helicopter.position[2] = 500.0;
 
     //Main do openGL
