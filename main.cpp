@@ -14,12 +14,12 @@ struct Airplane
     bool moving = false;
     bool inside = false;
     float angle = 270.0;
-    float position[3] = {0.0, 0.0, 0.0};
+    float position[3] = {0.0, -95.0, 0.0};
     GLfloat facing[3] = {1.0, 0.0, 0.0};
 };
 
 Airplane airplane;
-Model tower, airfield, road;
+Model tower, building, road, farmhouse, mountain;
 int width = 500, height = 500;
 GLfloat coords[3] = {0.0, 0.0, 0.0};
 
@@ -88,53 +88,84 @@ void display(void)
     glColor4f(0.5, 0.5, 0.5, 0.3);
     glRotatef(30, 0.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
-    glVertex3f(-1000.0, 0.0, -1000.0);
-    glVertex3f(-1000.0, 0.0, 1000.0);
-    glVertex3f(1000.0, 0.0, 1000.0);
-    glVertex3f(1000.0, 0.0, -1000.0);
+    glVertex3f(-10000.0, 0.0, -10000.0);
+    glVertex3f(-10000.0, 0.0, 10000.0);
+    glVertex3f(10000.0, 0.0, 10000.0);
+    glVertex3f(10000.0, 0.0, -10000.0);
     glEnd();
     glPopMatrix();
 
+    
     //Desenha estrada
-    glPushMatrix();
-    glColor4f(1.0, 0.0, 1.0, 0.8);
-    glTranslatef(0, 0, 0);
-    glScalef(15.0, 15.0, 15.0);
-    glRotatef(90, 0.0, 1.0, 0.0);
-    glBegin(GL_QUADS);
-    for (auto &face : road.faces)
+    for(int i = 0; i < 500; i+=50)
     {
-        for (auto &vertex : face.vertices)
+        glPushMatrix();
+        glColor4f(1.0, 0.0, 1.0, 0.8);
+        glTranslatef(315-i, 0, 20);
+        glScalef(15.0, 15.0, 15.0);
+        glRotatef(90, 0.0, 1.0, 0.0);
+        glBegin(GL_QUADS);
+        for (auto &face : road.faces)
         {
-            glVertex4f(road.geometric_vertices[vertex.geometric_vertex].x,
-                       road.geometric_vertices[vertex.geometric_vertex].y,
-                       road.geometric_vertices[vertex.geometric_vertex].z,
-                       road.geometric_vertices[vertex.geometric_vertex].w);
+            for (auto &vertex : face.vertices)
+            {
+                glVertex4f(road.geometric_vertices[vertex.geometric_vertex].x,
+                        road.geometric_vertices[vertex.geometric_vertex].y,
+                        road.geometric_vertices[vertex.geometric_vertex].z,
+                        road.geometric_vertices[vertex.geometric_vertex].w);
+            }
         }
+        glEnd();
+        glPopMatrix();
     }
-    glEnd();
-    glPopMatrix();
 
     //Desenha prédio
-    glPushMatrix();
-    glColor4f(0.0, 1.0, 1.0, 0.8);
-    glTranslatef(100, 0, 0);
-    glScalef(5.0, 5.0, 5.0);
-    glRotatef(45, 0.0, 1.0, 0.0);
-    glBegin(GL_QUADS);
-    for (auto &face : airfield.faces)
+    for (int i = 150; i < 2000; i+=150)
     {
-        for (auto &vertex : face.vertices)
+        glPushMatrix();
+        glColor4f(0.0, 1.0, 1.0, 0.8);
+        glTranslatef(100, 0, 0+i);
+        glScalef(5.0, 5.0, 5.0);
+        glRotatef(45, 0.0, 1.0, 0.0);
+        glBegin(GL_QUADS);
+        for (auto &face : building.faces)
         {
-            glVertex4f(airfield.geometric_vertices[vertex.geometric_vertex].x,
-                       airfield.geometric_vertices[vertex.geometric_vertex].y,
-                       airfield.geometric_vertices[vertex.geometric_vertex].z,
-                       airfield.geometric_vertices[vertex.geometric_vertex].w);
+            for (auto &vertex : face.vertices)
+            {
+                glVertex4f(building.geometric_vertices[vertex.geometric_vertex].x,
+                        building.geometric_vertices[vertex.geometric_vertex].y,
+                        building.geometric_vertices[vertex.geometric_vertex].z,
+                        building.geometric_vertices[vertex.geometric_vertex].w);
+            }
         }
+        glEnd();
+        glPopMatrix();
     }
-    glEnd();
-    glPopMatrix();
 
+    //Desenha casa
+    for (int i = 500; i < 5000; i+=500)
+    {
+        glPushMatrix();
+        glColor4f(0.0, 1.0, 1.0, 0.8);
+        glTranslatef(100+i, 0, 100+i);
+        glScalef(5.0, 5.0, 5.0);
+        glRotatef(45, 0.0, 1.0, 0.0);
+        glBegin(GL_QUADS);
+        for (auto &face : farmhouse.faces)
+        {
+            for (auto &vertex : face.vertices)
+            {
+                glVertex4f(farmhouse.geometric_vertices[vertex.geometric_vertex].x,
+                            farmhouse.geometric_vertices[vertex.geometric_vertex].y,
+                            farmhouse.geometric_vertices[vertex.geometric_vertex].z,
+                            farmhouse.geometric_vertices[vertex.geometric_vertex].w);
+            }
+        }
+        glEnd();
+        glPopMatrix();
+    }
+
+    
     //Desenha torre
     glPushMatrix();
     glColor4f(0.0, 1.0, 0.0, 0.8);
@@ -153,7 +184,26 @@ void display(void)
         }
     }
     glEnd();
+    glPopMatrix();
 
+    //Desenha montanha
+    glPushMatrix();
+    glColor4f(0.0, 0.0, 0.0, 0.8);
+    glTranslatef(-1500, -50, -1500);
+    glScalef(5.0, 5.0, 5.0);
+    glRotatef(90, 0.0, 1.0, 0.0);
+    glBegin(GL_TRIANGLES);
+    for (auto &face : mountain.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex4f(mountain.geometric_vertices[vertex.geometric_vertex].x,
+                       mountain.geometric_vertices[vertex.geometric_vertex].y,
+                       mountain.geometric_vertices[vertex.geometric_vertex].z,
+                       mountain.geometric_vertices[vertex.geometric_vertex].w);
+        }
+    }
+    glEnd();
     glPopMatrix();
 
     //Desenha avião
@@ -194,17 +244,17 @@ void keyboard(unsigned char key, int x, int y)
 
     if (key == 'z' || key == 'Z')
     {
-        if (airplane.position[1] > 0)
+        if (airplane.position[1] > -95.0)
             airplane.position[1] -= 5.0;
     }
 
-    if (key == 'd' || key == 'D')
+    if (key == 'a' || key == 'A')
     {
         airplane.angle += 1.0;
         rotate_y(-1.0);
     }
 
-    if (key == 'a' || key == 'A')
+    if (key == 'd' || key == 'D')
     {
         airplane.angle -= 1.0;
         rotate_y(1.0);
@@ -244,16 +294,24 @@ int main(int argc, char **argv)
     obj2.load(tower);
 
     OBJ obj3("Samples/building.obj");
-    obj3.load(airfield);
+    obj3.load(building);
 
     OBJ obj4("Samples/road.obj");
     obj4.load(road);
+    
+    OBJ obj5("Samples/farmhouse.obj");
+    obj5.load(farmhouse);
+
+    OBJ obj6("Samples/mountain.obj");
+    obj6.load(mountain);
+
+    
 
     //Main do openGL
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(width, height);
-    glutCreateWindow("Trabalho de Computação Gráfica");
+    glutCreateWindow("Trabalho de CG");
     init();
     glutIdleFunc(display);
     glutKeyboardFunc(keyboard);
