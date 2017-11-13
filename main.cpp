@@ -19,6 +19,7 @@ struct Airplane
 };
 
 Airplane airplane;
+Airplane air_balloon;
 Model tower, building, road, farmhouse, mountain;
 int width = 500, height = 500;
 GLfloat coords[3] = {0.0, 0.0, 0.0};
@@ -206,6 +207,27 @@ void display(void)
     glEnd();
     glPopMatrix();
 
+    //Desenha balão
+    glPushMatrix();
+    glTranslatef(air_balloon.position[0], air_balloon.position[1], air_balloon.position[2]);
+    glScalef(1.0, 1.0, 1.0);
+    glRotatef(air_balloon.angle, 0.0, 1.0, 0.0);
+    glColor3f(1.0, 0.0, 0.0);
+
+    glBegin(GL_TRIANGLES);
+    for (auto &face : air_balloon.model.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex4f(air_balloon.model.geometric_vertices[vertex.geometric_vertex].x,
+                       air_balloon.model.geometric_vertices[vertex.geometric_vertex].y,
+                       air_balloon.model.geometric_vertices[vertex.geometric_vertex].z,
+                       air_balloon.model.geometric_vertices[vertex.geometric_vertex].w);
+        }
+    }
+    glEnd();
+    glPopMatrix();
+
     //Desenha avião
     glPushMatrix();
     glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
@@ -279,11 +301,26 @@ void keyboard(unsigned char key, int x, int y)
     {
         airplane.inside = true;
     }
+
+    if (key == '1')
+    {
+        printf("apertei 1\n");
+    }
+
+    if (key == '2')
+    {
+        printf("apertei 2\n");
+    }
+
+    if (key == '3')
+    {
+        printf("apertei 3\n");
+    }
 }
 
 int main(int argc, char **argv)
 {
-    Model model;
+    Model model, model2;
 
     //Load dos modelos
     OBJ obj("Samples/airplane.obj");
@@ -305,7 +342,13 @@ int main(int argc, char **argv)
     OBJ obj6("Samples/mountain.obj");
     obj6.load(mountain);
 
-    
+    OBJ obj7("Samples/air_balloon.obj");
+    obj7.load(model2);
+    air_balloon.model = model2;
+    air_balloon.angle = 90.0;
+    air_balloon.position[0] = 250.0;
+    air_balloon.position[1] = 5.0;
+    air_balloon.position[2] = 50.0;
 
     //Main do openGL
     glutInit(&argc, argv);
