@@ -8,29 +8,45 @@
 
 using namespace std;
 
-struct Airplane
+struct Flying_machines
 {
     Model model;
     bool moving = false;
     bool inside = false;
     float angle = 270.0;
-    float position[3] = {0.0, -95.0, 0.0};
-    GLfloat facing[3] = {1.0, 0.0, 0.0};
+    float position[3] = {0.0, 2.0, 0.0};
+    float facing[3] = {1.0, 0.0, 0.0};
 };
 
-Airplane airplane;
-Airplane air_balloon;
+Flying_machines airplane, air_balloon, helicopter;
 Model tower, building, road, farmhouse, mountain;
-int width = 500, height = 500;
-GLfloat coords[3] = {0.0, 0.0, 0.0};
+int width = 500, height = 500, fm_selected = 1;
 
 void rotate_y(float angle)
 {
     angle *= 0.0174533;
-    float x = airplane.facing[0];
-    float z = airplane.facing[2];
-    airplane.facing[0] = x * cos(angle) - z * sin(angle);
-    airplane.facing[2] = x * sin(angle) + z * cos(angle);
+    switch (fm_selected)
+    {
+        float x, z;
+    case 1:
+        x = airplane.facing[0];
+        z = airplane.facing[2];
+        airplane.facing[0] = x * cos(angle) - z * sin(angle);
+        airplane.facing[2] = x * sin(angle) + z * cos(angle);
+        break;
+    case 2:
+        x = air_balloon.facing[0];
+        z = air_balloon.facing[2];
+        air_balloon.facing[0] = x * cos(angle) - z * sin(angle);
+        air_balloon.facing[2] = x * sin(angle) + z * cos(angle);
+        break;
+    case 3:
+        x = helicopter.facing[0];
+        z = helicopter.facing[2];
+        helicopter.facing[0] = x * cos(angle) - z * sin(angle);
+        helicopter.facing[2] = x * sin(angle) + z * cos(angle);
+        break;
+    }
 }
 
 void init(void)
@@ -39,7 +55,6 @@ void init(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glFrustum(-2.0, 2.0, -1.225, 1.225, 2.0, 10000.0);
-
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -47,41 +62,119 @@ void display(void)
 {
 
     //Movimentação
-    if (airplane.moving)
+    if (airplane.moving || air_balloon.moving || helicopter.moving)
     {
-        airplane.position[0] -= 5 * airplane.facing[0];
-        airplane.position[2] -= 5 * airplane.facing[2];
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.position[0] -= 5 * airplane.facing[0];
+            airplane.position[2] -= 5 * airplane.facing[2];
+            break;
+
+        case 2:
+            air_balloon.position[0] -= 5 * air_balloon.facing[0];
+            air_balloon.position[2] -= 5 * air_balloon.facing[2];
+            break;
+
+        case 3:
+            helicopter.position[0] -= 5 * helicopter.facing[0];
+            helicopter.position[2] -= 5 * helicopter.facing[2];
+            break;
+        }
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    //Mudança entre camera dentro e fora do avião
-    if (airplane.inside)
+    switch (fm_selected)
     {
-        gluLookAt(
-            airplane.position[0] - (airplane.facing[0] * 10),
-            airplane.position[1] + 70,
-            airplane.position[2] - (airplane.facing[2] * 10),
-            airplane.position[0] - (airplane.facing[0] * 300),
-            airplane.position[1],
-            airplane.position[2] - (airplane.facing[2] * 300),
-            0.0,
-            1.0,
-            0.0);
-    }
-    else
-    {
-        gluLookAt(
-            airplane.position[0] + (airplane.facing[0] * 300),
-            airplane.position[1] + 100,
-            airplane.position[2] + (airplane.facing[2] * 300),
-            airplane.position[0] - (airplane.facing[0] * 100),
-            airplane.position[1] - (airplane.facing[1] * 100),
-            airplane.position[2] - (airplane.facing[2] * 100),
-            0.0,
-            1.0,
-            0.0);
+    case 1:
+        //Mudança entre camera dentro e fora do avião
+        if (airplane.inside)
+        {
+            gluLookAt(
+                airplane.position[0] - (airplane.facing[0] * 10),
+                airplane.position[1] + 100,
+                airplane.position[2] - (airplane.facing[2] * 10),
+                airplane.position[0] - (airplane.facing[0] * 300),
+                airplane.position[1],
+                airplane.position[2] - (airplane.facing[2] * 300),
+                0.0,
+                1.0,
+                0.0);
+        }
+        else
+        {
+            gluLookAt(
+                airplane.position[0] + (airplane.facing[0] * 300),
+                airplane.position[1] + 100,
+                airplane.position[2] + (airplane.facing[2] * 300),
+                airplane.position[0] - (airplane.facing[0] * 100),
+                airplane.position[1] - (airplane.facing[1] * 100),
+                airplane.position[2] - (airplane.facing[2] * 100),
+                0.0,
+                1.0,
+                0.0);
+        }
+        break;
+
+    case 2:
+        if (air_balloon.inside)
+        {
+            gluLookAt(
+                air_balloon.position[0] - (air_balloon.facing[0] * 10),
+                air_balloon.position[1] + 100,
+                air_balloon.position[2] - (air_balloon.facing[2] * 10),
+                air_balloon.position[0] - (air_balloon.facing[0] * 300),
+                air_balloon.position[1],
+                air_balloon.position[2] - (air_balloon.facing[2] * 300),
+                0.0,
+                1.0,
+                0.0);
+        }
+        else
+        {
+            gluLookAt(
+                air_balloon.position[0] + (air_balloon.facing[0] * 300),
+                air_balloon.position[1] + 100,
+                air_balloon.position[2] + (air_balloon.facing[2] * 300),
+                air_balloon.position[0] - (air_balloon.facing[0] * 100),
+                air_balloon.position[1] - (air_balloon.facing[1] * 100),
+                air_balloon.position[2] - (air_balloon.facing[2] * 100),
+                0.0,
+                1.0,
+                0.0);
+        }
+        break;
+
+    case 3:
+        if (helicopter.inside)
+        {
+            gluLookAt(
+                helicopter.position[0] - (helicopter.facing[0] * 10),
+                helicopter.position[1] + 100,
+                helicopter.position[2] - (helicopter.facing[2] * 10),
+                helicopter.position[0] - (helicopter.facing[0] * 300),
+                helicopter.position[1],
+                helicopter.position[2] - (helicopter.facing[2] * 300),
+                0.0,
+                1.0,
+                0.0);
+        }
+        else
+        {
+            gluLookAt(
+                helicopter.position[0] + (helicopter.facing[0] * 300),
+                helicopter.position[1] + 100,
+                helicopter.position[2] + (helicopter.facing[2] * 300),
+                helicopter.position[0] - (helicopter.facing[0] * 100),
+                helicopter.position[1] - (helicopter.facing[1] * 100),
+                helicopter.position[2] - (helicopter.facing[2] * 100),
+                0.0,
+                1.0,
+                0.0);
+        }
+        break;
     }
 
     //Desenha "asfalto"
@@ -96,13 +189,12 @@ void display(void)
     glEnd();
     glPopMatrix();
 
-    
     //Desenha estrada
-    for(int i = 0; i < 500; i+=50)
+    for (int i = 0; i < 500; i += 50)
     {
         glPushMatrix();
         glColor4f(1.0, 0.0, 1.0, 0.8);
-        glTranslatef(315-i, 0, 20);
+        glTranslatef(315 - i, 2, 20);
         glScalef(15.0, 15.0, 15.0);
         glRotatef(90, 0.0, 1.0, 0.0);
         glBegin(GL_QUADS);
@@ -111,9 +203,9 @@ void display(void)
             for (auto &vertex : face.vertices)
             {
                 glVertex4f(road.geometric_vertices[vertex.geometric_vertex].x,
-                        road.geometric_vertices[vertex.geometric_vertex].y,
-                        road.geometric_vertices[vertex.geometric_vertex].z,
-                        road.geometric_vertices[vertex.geometric_vertex].w);
+                           road.geometric_vertices[vertex.geometric_vertex].y,
+                           road.geometric_vertices[vertex.geometric_vertex].z,
+                           road.geometric_vertices[vertex.geometric_vertex].w);
             }
         }
         glEnd();
@@ -121,11 +213,11 @@ void display(void)
     }
 
     //Desenha prédio
-    for (int i = 150; i < 2000; i+=150)
+    for (int i = 150; i < 2000; i += 150)
     {
         glPushMatrix();
         glColor4f(0.0, 1.0, 1.0, 0.8);
-        glTranslatef(100, 0, 0+i);
+        glTranslatef(100, 2, 0 + i);
         glScalef(5.0, 5.0, 5.0);
         glRotatef(45, 0.0, 1.0, 0.0);
         glBegin(GL_QUADS);
@@ -134,9 +226,9 @@ void display(void)
             for (auto &vertex : face.vertices)
             {
                 glVertex4f(building.geometric_vertices[vertex.geometric_vertex].x,
-                        building.geometric_vertices[vertex.geometric_vertex].y,
-                        building.geometric_vertices[vertex.geometric_vertex].z,
-                        building.geometric_vertices[vertex.geometric_vertex].w);
+                           building.geometric_vertices[vertex.geometric_vertex].y,
+                           building.geometric_vertices[vertex.geometric_vertex].z,
+                           building.geometric_vertices[vertex.geometric_vertex].w);
             }
         }
         glEnd();
@@ -144,11 +236,11 @@ void display(void)
     }
 
     //Desenha casa
-    for (int i = 500; i < 5000; i+=500)
+    for (int i = 500; i < 5000; i += 500)
     {
         glPushMatrix();
         glColor4f(0.0, 1.0, 1.0, 0.8);
-        glTranslatef(100+i, 0, 100+i);
+        glTranslatef(100 + i, 2, 100 + i);
         glScalef(5.0, 5.0, 5.0);
         glRotatef(45, 0.0, 1.0, 0.0);
         glBegin(GL_QUADS);
@@ -157,20 +249,19 @@ void display(void)
             for (auto &vertex : face.vertices)
             {
                 glVertex4f(farmhouse.geometric_vertices[vertex.geometric_vertex].x,
-                            farmhouse.geometric_vertices[vertex.geometric_vertex].y,
-                            farmhouse.geometric_vertices[vertex.geometric_vertex].z,
-                            farmhouse.geometric_vertices[vertex.geometric_vertex].w);
+                           farmhouse.geometric_vertices[vertex.geometric_vertex].y,
+                           farmhouse.geometric_vertices[vertex.geometric_vertex].z,
+                           farmhouse.geometric_vertices[vertex.geometric_vertex].w);
             }
         }
         glEnd();
         glPopMatrix();
     }
 
-    
     //Desenha torre
     glPushMatrix();
     glColor4f(0.0, 1.0, 0.0, 0.8);
-    glTranslatef(-1000, 0, -1000);
+    glTranslatef(-1000, 2, -1000);
     glScalef(50.0, 50.0, 50.0);
     glRotatef(90, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
@@ -190,7 +281,7 @@ void display(void)
     //Desenha montanha
     glPushMatrix();
     glColor4f(0.0, 0.0, 0.0, 0.8);
-    glTranslatef(-1500, -50, -1500);
+    glTranslatef(-1500, 2, -1500);
     glScalef(5.0, 5.0, 5.0);
     glRotatef(90, 0.0, 1.0, 0.0);
     glBegin(GL_TRIANGLES);
@@ -228,6 +319,28 @@ void display(void)
     glEnd();
     glPopMatrix();
 
+    //Desenha millenium falcon
+    glPushMatrix();
+    glTranslatef(helicopter.position[0], helicopter.position[1], helicopter.position[2]);
+    glRotatef(helicopter.angle, 0.0, 1.0, 0.0);
+    glColor3f(1.0, 0.0, 0.0);
+
+    glBegin(GL_TRIANGLES);
+    for (auto &face : helicopter.model.faces)
+    {
+        for (auto &vertex : face.vertices)
+        {
+            glVertex4f(helicopter.model.geometric_vertices[vertex.geometric_vertex].x,
+                       helicopter.model.geometric_vertices[vertex.geometric_vertex].y,
+                       helicopter.model.geometric_vertices[vertex.geometric_vertex].z,
+                       helicopter.model.geometric_vertices[vertex.geometric_vertex].w);
+        }
+    }
+    glEnd();
+    glPopMatrix();
+
+    glutSwapBuffers();
+
     //Desenha avião
     glPushMatrix();
     glTranslatef(airplane.position[0], airplane.position[1], airplane.position[2]);
@@ -260,67 +373,170 @@ void keyboard(unsigned char key, int x, int y)
 
     if (key == 'x' || key == 'X')
     {
-        if (airplane.position[1] < 4000)
-            airplane.position[1] += 5.0;
+        switch (fm_selected)
+        {
+        case 1:
+            if (airplane.position[1] < 4000)
+                airplane.position[1] += 5.0;
+            break;
+        case 2:
+            if (air_balloon.position[1] < 4000)
+                air_balloon.position[1] += 5.0;
+            break;
+        case 3:
+            if (helicopter.position[1] < 4000)
+                helicopter.position[1] += 5.0;
+            break;
+        }
     }
 
     if (key == 'z' || key == 'Z')
     {
-        if (airplane.position[1] > -95.0)
-            airplane.position[1] -= 5.0;
+
+        switch (fm_selected)
+        {
+        case 1:
+            if (airplane.position[1] > 2.0)
+                airplane.position[1] -= 5.0;
+            break;
+        case 2:
+            if (air_balloon.position[1] > 2.0)
+                air_balloon.position[1] -= 5.0;
+            break;
+        case 3:
+            if (helicopter.position[1] > 2.0)
+                helicopter.position[1] -= 5.0;
+            break;
+        }
     }
 
     if (key == 'a' || key == 'A')
     {
-        airplane.angle += 1.0;
-        rotate_y(-1.0);
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.angle += 1.0;
+            rotate_y(-1.0);
+            break;
+        case 2:
+            air_balloon.angle += 1.0;
+            rotate_y(-1.0);
+            break;
+        case 3:
+            helicopter.angle += 1.0;
+            rotate_y(-1.0);
+            break;
+        }
     }
 
     if (key == 'd' || key == 'D')
     {
-        airplane.angle -= 1.0;
-        rotate_y(1.0);
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.angle -= 1.0;
+            rotate_y(1.0);
+            break;
+        case 2:
+            air_balloon.angle -= 1.0;
+            rotate_y(1.0);
+            break;
+        case 3:
+            helicopter.angle -= 1.0;
+            rotate_y(1.0);
+            break;
+        }
     }
 
     if (key == 'w' || key == 'W')
     {
-        airplane.moving = true;
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.moving = true;
+            break;
+        case 2:
+            air_balloon.moving = true;
+            break;
+        case 3:
+            helicopter.moving = true;
+            break;
+        }
     }
 
     if (key == 's' || key == 'S')
     {
-        airplane.moving = false;
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.moving = false;
+            break;
+        case 2:
+            air_balloon.moving = false;
+            break;
+        case 3:
+            helicopter.moving = false;
+            break;
+        }
     }
 
     if (key == 'f' || key == 'F')
     {
-        airplane.inside = false;
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.inside = false;
+            break;
+        case 2:
+            air_balloon.inside = false;
+            break;
+        case 3:
+            helicopter.inside = false;
+            break;
+        }
     }
 
     if (key == 'i' || key == 'I')
     {
-        airplane.inside = true;
+        switch (fm_selected)
+        {
+        case 1:
+            airplane.inside = true;
+            break;
+        case 2:
+            air_balloon.inside = true;
+            break;
+        case 3:
+            helicopter.inside = true;
+            break;
+        }
     }
 
     if (key == '1')
     {
-        printf("apertei 1\n");
+        fm_selected = 1;
+        air_balloon.moving = false;
+        helicopter.moving = false;
     }
 
     if (key == '2')
     {
-        printf("apertei 2\n");
+        fm_selected = 2;
+        airplane.moving = false;
+        helicopter.moving = false;
     }
 
     if (key == '3')
     {
-        printf("apertei 3\n");
+        fm_selected = 3;
+        airplane.moving = false;
+        air_balloon.moving = false;
     }
 }
 
 int main(int argc, char **argv)
 {
-    Model model, model2;
+    Model model, model2, model3;
 
     //Load dos modelos
     OBJ obj("Samples/airplane.obj");
@@ -335,7 +551,7 @@ int main(int argc, char **argv)
 
     OBJ obj4("Samples/road.obj");
     obj4.load(road);
-    
+
     OBJ obj5("Samples/farmhouse.obj");
     obj5.load(farmhouse);
 
@@ -346,9 +562,17 @@ int main(int argc, char **argv)
     obj7.load(model2);
     air_balloon.model = model2;
     air_balloon.angle = 90.0;
-    air_balloon.position[0] = 250.0;
+    air_balloon.position[0] = -500.0;
     air_balloon.position[1] = 5.0;
-    air_balloon.position[2] = 50.0;
+    air_balloon.position[2] = 500.0;
+
+    OBJ obj8("Samples/helicopter.obj");
+    obj8.load(model3);
+    helicopter.model = model3;
+    helicopter.angle = 90.0;
+    helicopter.position[0] = 500.0;
+    //helicopter.position[1] = 5.0;
+    helicopter.position[2] = 500.0;
 
     //Main do openGL
     glutInit(&argc, argv);
@@ -359,6 +583,7 @@ int main(int argc, char **argv)
     glutIdleFunc(display);
     glutKeyboardFunc(keyboard);
     glutDisplayFunc(display);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glutMainLoop();
 
