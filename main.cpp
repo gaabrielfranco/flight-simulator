@@ -284,7 +284,7 @@ void display(void)
     glTranslatef(-1500, 2, -1500);
     glScalef(5.0, 5.0, 5.0);
     glRotatef(90, 0.0, 1.0, 0.0);
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLE_STRIP);
     for (auto &face : mountain.faces)
     {
         for (auto &vertex : face.vertices)
@@ -305,7 +305,7 @@ void display(void)
     glRotatef(air_balloon.angle, 0.0, 1.0, 0.0);
     glColor3f(1.0, 0.0, 0.0);
 
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLE_STRIP);
     for (auto &face : air_balloon.model.faces)
     {
         for (auto &vertex : face.vertices)
@@ -347,7 +347,7 @@ void display(void)
     glRotatef(airplane.angle, 0.0, 1.0, 0.0);
     glColor3f(1.0, 0.0, 0.0);
 
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLE_STRIP);
     for (auto &face : airplane.model.faces)
     {
         for (auto &vertex : face.vertices)
