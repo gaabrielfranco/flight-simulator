@@ -2,9 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <ctime>
-#include <gm.h>
-
-#define num_objects 10
+#include <math.h>
 
 using namespace std;
 
@@ -21,6 +19,22 @@ struct Flying_machines
 Flying_machines airplane, air_balloon, helicopter;
 Model tower, building, road, farmhouse, mountain;
 int width = 500, height = 500, fm_selected = 1;
+
+GLfloat white_light[] = {1.0, 1.0, 1.0, 1.0};
+GLfloat sun_light[] = {1.0, 0.3, 0.2};
+
+GLfloat mat_ambient[] = {0.1, 0.1, 0.1, 1.0};
+GLfloat mat_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+GLfloat mat_shininess[] = {0.5, 0.5, 0.5, 1.0};
+GLfloat mat_specular[] = {0.5, 0.5, 0.5, 1.0};
+
+GLfloat sLightPos1[] = {0.0, 100.0, 0.0, 0.0};
+
+GLfloat sLightPos2[] = {0.0, 100.0, 0.0, 1.0};
+GLfloat sLightDir2[] = {0.0, -1.0, 0.0};
+
+bool light1 = true;
+bool light2 = true;
 
 void rotate_y(float angle)
 {
@@ -56,6 +70,10 @@ void init(void)
     glLoadIdentity();
     glFrustum(-2.0, 2.0, -1.225, 1.225, 2.0, 10000.0);
     glMatrixMode(GL_MODELVIEW);
+
+    //Luz
+    glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
 }
 
 void display(void)
@@ -82,6 +100,14 @@ void display(void)
             break;
         }
     }
+
+    //Iluminação
+    sLightPos2[0] = airplane.position[0] + (airplane.facing[0] * 100);
+    sLightPos2[1] = airplane.position[1] + 300;
+    sLightPos2[2] = airplane.position[2] + (airplane.facing[2] * 100);
+    sLightDir2[0] = (airplane.position[0] + (airplane.facing[0] * 50)) - sLightPos2[0];
+    sLightDir2[1] = (airplane.position[1] + (airplane.facing[1] * 50)) - sLightPos2[1];
+    sLightDir2[2] = (airplane.position[2] + (airplane.facing[2] * 50)) - sLightPos2[2];
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -177,6 +203,36 @@ void display(void)
         break;
     }
 
+    //Iluminação
+
+    glLightfv(GL_LIGHT1, GL_POSITION, sLightPos2);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, sLightDir2);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+    glLightfv(GL_LIGHT2, GL_AMBIENT, white_light);
+    glLightfv(GL_LIGHT2, GL_POSITION, sLightPos1);
+
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, sun_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, sun_light);
+    glLightfv(GL_LIGHT0, GL_SHININESS, sun_light);
+
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, white_light);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, white_light);
+    glLightfv(GL_LIGHT1, GL_SHININESS, white_light);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 100.0);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     //Desenha chão
     glPushMatrix();
     glColor4f(0.5, 0.5, 0.5, 0.3);
@@ -206,6 +262,10 @@ void display(void)
                            road.geometric_vertices[vertex.geometric_vertex].y,
                            road.geometric_vertices[vertex.geometric_vertex].z,
                            road.geometric_vertices[vertex.geometric_vertex].w);
+
+                glNormal3f(road.normal_vertices[vertex.normal_vertex].i,
+                           road.normal_vertices[vertex.normal_vertex].j,
+                           road.normal_vertices[vertex.normal_vertex].k);
             }
         }
         glEnd();
@@ -229,6 +289,10 @@ void display(void)
                            building.geometric_vertices[vertex.geometric_vertex].y,
                            building.geometric_vertices[vertex.geometric_vertex].z,
                            building.geometric_vertices[vertex.geometric_vertex].w);
+
+                glNormal3f(building.normal_vertices[vertex.normal_vertex].i,
+                           building.normal_vertices[vertex.normal_vertex].j,
+                           building.normal_vertices[vertex.normal_vertex].k);
             }
         }
         glEnd();
@@ -252,6 +316,10 @@ void display(void)
                            farmhouse.geometric_vertices[vertex.geometric_vertex].y,
                            farmhouse.geometric_vertices[vertex.geometric_vertex].z,
                            farmhouse.geometric_vertices[vertex.geometric_vertex].w);
+
+                glNormal3f(farmhouse.normal_vertices[vertex.normal_vertex].i,
+                           farmhouse.normal_vertices[vertex.normal_vertex].j,
+                           farmhouse.normal_vertices[vertex.normal_vertex].k);
             }
         }
         glEnd();
@@ -273,6 +341,10 @@ void display(void)
                        tower.geometric_vertices[vertex.geometric_vertex].y,
                        tower.geometric_vertices[vertex.geometric_vertex].z,
                        tower.geometric_vertices[vertex.geometric_vertex].w);
+
+            glNormal3f(tower.normal_vertices[vertex.normal_vertex].i,
+                       tower.normal_vertices[vertex.normal_vertex].j,
+                       tower.normal_vertices[vertex.normal_vertex].k);
         }
     }
     glEnd();
@@ -293,6 +365,9 @@ void display(void)
                        mountain.geometric_vertices[vertex.geometric_vertex].y,
                        mountain.geometric_vertices[vertex.geometric_vertex].z,
                        mountain.geometric_vertices[vertex.geometric_vertex].w);
+            glNormal3f(mountain.normal_vertices[vertex.normal_vertex].i,
+                       mountain.normal_vertices[vertex.normal_vertex].j,
+                       mountain.normal_vertices[vertex.normal_vertex].k);
         }
     }
     glEnd();
@@ -314,6 +389,10 @@ void display(void)
                        air_balloon.model.geometric_vertices[vertex.geometric_vertex].y,
                        air_balloon.model.geometric_vertices[vertex.geometric_vertex].z,
                        air_balloon.model.geometric_vertices[vertex.geometric_vertex].w);
+
+            glNormal3f(air_balloon.model.normal_vertices[vertex.normal_vertex].i,
+                       air_balloon.model.normal_vertices[vertex.normal_vertex].j,
+                       air_balloon.model.normal_vertices[vertex.normal_vertex].k);
         }
     }
     glEnd();
@@ -334,6 +413,10 @@ void display(void)
                        helicopter.model.geometric_vertices[vertex.geometric_vertex].y,
                        helicopter.model.geometric_vertices[vertex.geometric_vertex].z,
                        helicopter.model.geometric_vertices[vertex.geometric_vertex].w);
+
+            glNormal3f(helicopter.model.normal_vertices[vertex.normal_vertex].i,
+                       helicopter.model.normal_vertices[vertex.normal_vertex].j,
+                       helicopter.model.normal_vertices[vertex.normal_vertex].k);
         }
     }
     glEnd();
@@ -356,6 +439,10 @@ void display(void)
                        airplane.model.geometric_vertices[vertex.geometric_vertex].y,
                        airplane.model.geometric_vertices[vertex.geometric_vertex].z,
                        airplane.model.geometric_vertices[vertex.geometric_vertex].w);
+
+            glNormal3f(airplane.model.normal_vertices[vertex.normal_vertex].i,
+                       airplane.model.normal_vertices[vertex.normal_vertex].j,
+                       airplane.model.normal_vertices[vertex.normal_vertex].k);
         }
     }
     glEnd();
@@ -584,6 +671,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
     glutMainLoop();
 
     glutMainLoop();
