@@ -21,7 +21,6 @@ Model tower, building, road, farmhouse, mountain;
 int width = 500, height = 500, fm_selected = 1;
 
 GLfloat white_light[] = {1.0, 1.0, 1.0, 1.0};
-GLfloat sun_light[] = {1.0, 0.3, 0.2};
 
 GLfloat mat_ambient[] = {0.1, 0.1, 0.1, 1.0};
 GLfloat mat_diffuse[] = {1.0, 1.0, 1.0, 1.0};
@@ -30,11 +29,14 @@ GLfloat mat_specular[] = {0.5, 0.5, 0.5, 1.0};
 
 GLfloat sLightPos1[] = {0.0, 100.0, 0.0, 0.0};
 
-GLfloat sLightPos2[] = {0.0, 100.0, 0.0, 1.0};
-GLfloat sLightDir2[] = {0.0, -1.0, 0.0};
+GLfloat sLightPos2Airplane[] = {0.0, 100.0, 0.0, 1.0};
+GLfloat sLightDir2Airplane[] = {0.0, -1.0, 0.0};
+GLfloat sLightPos2Ballon[] = {0.0, 100.0, 0.0, 1.0};
+GLfloat sLightDir2Ballon[] = {0.0, -1.0, 0.0};
+GLfloat sLightPos2Helicopter[] = {0.0, 100.0, 0.0, 1.0};
+GLfloat sLightDir2Helicopter[] = {0.0, -1.0, 0.0};
 
-bool light1 = true;
-bool light2 = true;
+bool active_light = false, light0 = false, light1 = false;
 
 void rotate_y(float angle)
 {
@@ -70,10 +72,6 @@ void init(void)
     glLoadIdentity();
     glFrustum(-2.0, 2.0, -1.225, 1.225, 2.0, 10000.0);
     glMatrixMode(GL_MODELVIEW);
-
-    //Luz
-    glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
 }
 
 void display(void)
@@ -101,13 +99,87 @@ void display(void)
         }
     }
 
+    //Iluminação airplane
+    sLightPos2Airplane[0] = airplane.position[0] + (airplane.facing[0] * 100);
+    sLightPos2Airplane[1] = airplane.position[1] + 300;
+    sLightPos2Airplane[2] = airplane.position[2] + (airplane.facing[2] * 100);
+    sLightDir2Airplane[0] = (airplane.position[0] + (airplane.facing[0] * 50)) - sLightPos2Airplane[0];
+    sLightDir2Airplane[1] = (airplane.position[1] + (airplane.facing[1] * 50)) - sLightPos2Airplane[1];
+    sLightDir2Airplane[2] = (airplane.position[2] + (airplane.facing[2] * 50)) - sLightPos2Airplane[2];
+
+    //Iluminação ballon
+    sLightPos2Ballon[0] = air_balloon.position[0] + (air_balloon.facing[0] * 100);
+    sLightPos2Ballon[1] = air_balloon.position[1] + 300;
+    sLightPos2Ballon[2] = air_balloon.position[2] + (air_balloon.facing[2] * 100);
+    sLightDir2Ballon[0] = (air_balloon.position[0] + (air_balloon.facing[0] * 50)) - sLightPos2Ballon[0];
+    sLightDir2Ballon[1] = (air_balloon.position[1] + (air_balloon.facing[1] * 50)) - sLightPos2Ballon[1];
+    sLightDir2Ballon[2] = (air_balloon.position[2] + (air_balloon.facing[2] * 50)) - sLightPos2Ballon[2];
+
+    //Iluminação helicopter
+    sLightPos2Helicopter[0] = helicopter.position[0] + (helicopter.facing[0] * 100);
+    sLightPos2Helicopter[1] = helicopter.position[1] + 300;
+    sLightPos2Helicopter[2] = helicopter.position[2] + (helicopter.facing[2] * 100);
+    sLightDir2Helicopter[0] = (helicopter.position[0] + (helicopter.facing[0] * 50)) - sLightPos2Helicopter[0];
+    sLightDir2Helicopter[1] = (helicopter.position[1] + (helicopter.facing[1] * 50)) - sLightPos2Helicopter[1];
+    sLightDir2Helicopter[2] = (helicopter.position[2] + (helicopter.facing[2] * 50)) - sLightPos2Helicopter[2];
+
     //Iluminação
-    sLightPos2[0] = airplane.position[0] + (airplane.facing[0] * 100);
-    sLightPos2[1] = airplane.position[1] + 300;
-    sLightPos2[2] = airplane.position[2] + (airplane.facing[2] * 100);
-    sLightDir2[0] = (airplane.position[0] + (airplane.facing[0] * 50)) - sLightPos2[0];
-    sLightDir2[1] = (airplane.position[1] + (airplane.facing[1] * 50)) - sLightPos2[1];
-    sLightDir2[2] = (airplane.position[2] + (airplane.facing[2] * 50)) - sLightPos2[2];
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, sLightPos1);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, white_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
+    glLightfv(GL_LIGHT0, GL_SHININESS, white_light);
+
+    switch (fm_selected)
+    {
+    case 1:
+        glLightfv(GL_LIGHT1, GL_POSITION, sLightPos2Airplane);
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, sLightDir2Airplane);
+        break;
+
+    case 2:
+        glLightfv(GL_LIGHT1, GL_POSITION, sLightPos2Ballon);
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, sLightDir2Ballon);
+        break;
+
+    case 3:
+        glLightfv(GL_LIGHT1, GL_POSITION, sLightPos2Helicopter);
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, sLightDir2Helicopter);
+        break;
+    }
+
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, white_light);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, white_light);
+    glLightfv(GL_LIGHT1, GL_SHININESS, white_light);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 15.0);
+
+    if (light0)
+    {
+        glEnable(GL_LIGHT0);
+    }
+    else
+    {
+        glDisable(GL_LIGHT0);
+    }
+
+    if (light1)
+    {
+        glEnable(GL_LIGHT1);
+    }
+    else
+    {
+        glDisable(GL_LIGHT1);
+    }
+
+    //glEnable(GL_LIGHT2);
+    glDepthFunc(GL_LEQUAL);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -202,36 +274,6 @@ void display(void)
         }
         break;
     }
-
-    //Iluminação
-
-    glLightfv(GL_LIGHT1, GL_POSITION, sLightPos2);
-    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, sLightDir2);
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-
-    glLightfv(GL_LIGHT2, GL_AMBIENT, white_light);
-    glLightfv(GL_LIGHT2, GL_POSITION, sLightPos1);
-
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, sun_light);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, sun_light);
-    glLightfv(GL_LIGHT0, GL_SHININESS, sun_light);
-
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, white_light);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, white_light);
-    glLightfv(GL_LIGHT1, GL_SHININESS, white_light);
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 100.0);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHT2);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //Desenha chão
     glPushMatrix();
@@ -551,7 +593,7 @@ void keyboard(unsigned char key, int x, int y)
         }
     }
 
-    if (key == 's' || key == 'S')
+    if (key == 'e' || key == 'E')
     {
         switch (fm_selected)
         {
@@ -597,6 +639,40 @@ void keyboard(unsigned char key, int x, int y)
             helicopter.inside = true;
             break;
         }
+    }
+
+    if (key == 'l' || key == 'L')
+    {
+        if (!active_light)
+        {
+            glEnable(GL_LIGHTING);
+            active_light = true;
+        }
+        else
+        {
+            glDisable(GL_LIGHTING);
+            active_light = false;
+        }
+    }
+
+    if (key == '4')
+    {
+        light0 = !light0;
+    }
+
+    if (key == '5')
+    {
+        light1 = !light1;
+    }
+
+    if (key == 's' || key == 'S')
+    {
+        glShadeModel(GL_FLAT);
+    }
+
+    if (key == 'g' || key == 'G')
+    {
+        glShadeModel(GL_SMOOTH);
     }
 
     if (key == '1')
