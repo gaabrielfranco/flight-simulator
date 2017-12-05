@@ -49,6 +49,8 @@ Flying_machines airplane, airplane2, arc170;
 Model model_airplane, model_plane2, model_arc170, tower, camel, road, farmhouse, mountain, rock, cacto, gundam;
 int width = 1440, height = 900, fm_selected = 1;
 
+double time_last, time_now, delta;
+
 Image *textureImage, *texture_road, *texture_rock;
 GLuint num_texture_house[0], num_textureAux2[1], num_texture_road[1], num_texture_rock[1], num_texture_cacto[1],
     num_texture_camel[1], num_texture_gundam[1];
@@ -396,23 +398,27 @@ void rotate_y(float angle)
 
 void display(void)
 {
+    time_last = time_now;
+    time_now = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    delta = time_now - time_last;
+
     if (airplane.moving || airplane2.moving || arc170.moving)
     {
         switch (fm_selected)
         {
         case 1:
-            airplane.position[0] -= 5 * airplane.facing[0];
-            airplane.position[2] -= 5 * airplane.facing[2];
+            airplane.position[0] -= 30 * delta * airplane.facing[0];
+            airplane.position[2] -= 30 * delta * airplane.facing[2];
             break;
 
         case 2:
-            airplane2.position[0] -= 5 * airplane2.facing[0];
-            airplane2.position[2] -= 5 * airplane2.facing[2];
+            airplane2.position[0] -= 30 * delta * airplane2.facing[0];
+            airplane2.position[2] -= 30 * delta * airplane2.facing[2];
             break;
 
         case 3:
-            arc170.position[0] -= 5 * arc170.facing[0];
-            arc170.position[2] -= 5 * arc170.facing[2];
+            arc170.position[0] -= 30 * delta * arc170.facing[0];
+            arc170.position[2] -= 30 * delta * arc170.facing[2];
             break;
         }
     }
@@ -1280,7 +1286,7 @@ int main(int argc, char **argv)
     srand(time(NULL));
 
     load_models();
-
+    time_now = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     /*
         OpenGL Main Loop
     */
@@ -1289,7 +1295,7 @@ int main(int argc, char **argv)
 
     glutInitWindowSize(width, height);
 
-    glutCreateWindow("Trabalho de CG");
+    glutCreateWindow("Flight Simulator v1.0");
     myinit();
 
     glMatrixMode(GL_PROJECTION);
