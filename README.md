@@ -3,7 +3,7 @@
 Esse projeto é um simulador de voo construído com OpenGL 2.1 e FreeGlut para a disciplina de INF 390 - Computação Gráfica da Universidade Federal de Viçosa (UFV)
 
 
-### Para carregar arquivos OBJ
+### Load OBJ files
 
  ```cpp
 Model model;
@@ -12,16 +12,14 @@ obj.load(model);
 ```
 
 ### Tech
-
-Utilizamos o MSYS2 MinGW 64bits com o CMake e o Ninja para compilar.
-
+* [gcc]
 * [MSYS2]
 * [CMake]
 * [Ninja]
 
 ### Installation (Windows)
-* Instale o MSYS2
-* No MYSYS2 MinGW 64-Bit, atualize os pacotes e instale o CMake, o Ninja e o gcc/g++
+* Install MSYS2
+* No shell do MYSYS2 MinGW 64-Bit, digite:
 
     ```sh
     pacman -Syu
@@ -48,3 +46,4 @@ cd <project_directory>
 [MSYS2]: <http://www.msys2.org>
 [Ninja]: <https://ninja-build.org>
 [CMake]: <https://cmake.org>
+[gcc]: <https://gcc.gnu.org>
