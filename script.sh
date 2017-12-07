@@ -1,4 +1,4 @@
 cd build/
 ninja
 cd ..
-./build/OBJ.exe
+./build/flight-simulator.exe
